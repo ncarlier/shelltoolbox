@@ -1,0 +1,26 @@
+#!/bin/sh
+
+export ETCD_TOKEN=$1
+
+if [ -z "$ETCD_TOKEN" ]; then
+    echo "ETCD token not defined. Getting a new one..."
+    export ETCD_TOKEN=$(curl --silent https://discovery.etcd.io/new)
+fi
+
+HOSTNAME=`hostname`
+IP=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+
+mkdir -p /run/systemd/system/etcd.service.d
+
+cat > /run/systemd/system/etcd.service.d/20-cloudinit.conf <<EOL
+[Service]
+Environment="ETCD_NAME=${HOSTNAME}"
+Environment="ETCD_DISCOVERY=${ETCD_TOKEN}"
+Environment="ETCD_ADDR=${IP}:4001"
+Environment="ETCD_PEER_ADDR=${IP}:7001"
+EOL
+
+echo $'ETCD configuration generated:\n'
+cat /run/systemd/system/etcd.service.d/20-cloudinit.conf
+
+echo $'\nType "sudo systemctl daemon-reload && sudo systemctl restart etcd" to restart service.'
