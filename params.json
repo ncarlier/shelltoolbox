@@ -1,0 +1,1 @@
+{"name":"Shelltoolbox","tagline":"Shell toolbox","body":"### Welcome to my Shell toolbox.\r\n\r\nLaunch any script with curl:\r\n\r\n```\r\n$ curl -s http://ncarlier.github.io/shelltoolbox/hello | sh\r\n```\r\n","google":"","note":"Don't delete this file! It's used internally to help with page regeneration."}
