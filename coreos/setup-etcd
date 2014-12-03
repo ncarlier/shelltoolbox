@@ -1,18 +1,40 @@
 #!/bin/sh
 
+confirm () {
+    # call with a prompt string or use a default
+    read -r -p "${1:-Are you sure? [y/N]} " response
+    case $response in
+        [yY][eE][sS]|[yY]) 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
 export ETCD_TOKEN=$1
 
 if [ -z "$ETCD_TOKEN" ]; then
-    echo "ETCD token not defined. Getting a new one..."
-    export ETCD_TOKEN=$(curl --silent https://discovery.etcd.io/new)
+    if confirm "ETCD token not defined. Getting a new one?" ; then
+        export ETCD_TOKEN=$(curl --silent https://discovery.etcd.io/new)
+    else
+        read -r -p "ETCD token: " ETCD_TOKEN
+    fi
 fi
 
 HOSTNAME=`hostname`
+if ! confirm "Does the hostname $HOSTNAME is valid?" ; then
+    read -r -p "Hostname: " HOSTNAME
+    hostname $HOSTNAME
+fi
+
 IP=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 
 mkdir -p /run/systemd/system/etcd.service.d
+[ "$?" != 0 ] && exit 1
 
-cat > /run/systemd/system/etcd.service.d/20-cloudinit.conf <<EOL
+cat > /run/systemd/system/etcd.service.d/20-custom.conf <<EOL
 [Service]
 Environment="ETCD_NAME=${HOSTNAME}"
 Environment="ETCD_DISCOVERY=${ETCD_TOKEN}"
@@ -21,6 +43,15 @@ Environment="ETCD_PEER_ADDR=${IP}:7001"
 EOL
 
 echo $'ETCD configuration generated:\n'
-cat /run/systemd/system/etcd.service.d/20-cloudinit.conf
+cat /run/systemd/system/etcd.service.d/20-custom.conf
 
-echo $'\nType "sudo systemctl daemon-reload && sudo systemctl restart etcd" to restart service.'
+confirm "Would you like to apply this configuration ?" || exit 2
+
+echo $'\nRestarting etcd service...'
+systemctl stop etcd
+[ "$?" != 0 ] && exit 1
+rm -rf /var/lib/etcd/*
+systemctl daemon-reload
+[ "$?" != 0 ] && exit 1
+systemctl restart etcd
+[ "$?" != 0 ] && exit 1
