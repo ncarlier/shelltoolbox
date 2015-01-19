@@ -1,0 +1,2 @@
+# Backup Nunux archives to remote archive server
+00 06 * * * root [ -x /usr/local/sbin/backup-nunux ] && /usr/local/sbin/backup-nunux

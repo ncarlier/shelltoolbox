@@ -1,0 +1,2 @@
+#!/bin/sh
+exec corkscrew proxy-internet.localnet 3128 $*

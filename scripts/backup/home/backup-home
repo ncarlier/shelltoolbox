@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export JOBNAME=backup-home
+JOBCMD="rsync -vr -e ssh /var/archives/ archive:/mnt/private/nicolas/archives/home --delete-after --stats"
+
+/usr/local/sbin/monitor-job $JOBCMD

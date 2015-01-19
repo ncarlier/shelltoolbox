@@ -1,0 +1,19 @@
+#! /usr/bin/env bash
+
+# CONFIG START
+TMPDIR="/tmp"
+DLBASKET="$TMPDIR/dlbasket"
+DLDIR="/data/tmp/downloads/"
+LOGFILE="$TMPDIR/dlbasketd.log"
+WGETLOGFILE="$TMPDIR/dlbasketd.wget.log"
+WGETBIN="/usr/bin/wget"
+
+cat <> $DLBASKET | (
+        while read url ; do
+                DATETIME="`date '+%Y-%m-%d %H:%M:%S'`"
+                echo "$DATETIME Starting: $url" >> $LOGFILE
+                $WGETBIN -c --output-file=$WGETLOGFILE --directory-prefix=$DLDIR $url
+                echo "$DATETIME Finished: $url" >> $LOGFILE
+        done )
+
+exit 0

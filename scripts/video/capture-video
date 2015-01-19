@@ -1,0 +1,7 @@
+#!/bin/bash
+sudo nice --10 mencoder \
+tv:// -tv driver=v4l2:input=1:width=720:height=576:norm=SECAM:alsa:audiorate=44100:immediatemode=0:forceaudio:adevice=hw.3,0 \
+-of mpeg -mpegopts format=dvd -vf pp=lb/ha/va/dr,hqdn3d,harddup \
+-oac lavc -srate 44100 -af lavcresample=44100 \
+-ovc lavc -lavcopts vcodec=mpeg2video:vrc_buf_size=1500:vrc_maxrate=8000:vbitrate=7000:keyint=15:acodec=mp2:abitrate=128:aspect=4/3 \
+-endpos 00:28:30 -o capture.mpg

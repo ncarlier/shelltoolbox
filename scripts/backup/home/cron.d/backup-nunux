@@ -1,0 +1,2 @@
+# Backup Nunux archives on this computer
+00 10 * * * root [ -x /usr/local/sbin/backup-nunux ] && /usr/local/sbin/backup-nunux
