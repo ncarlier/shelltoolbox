@@ -1,0 +1,12 @@
+PROXY="proxy-internet.localnet:3128" \
+all_proxy="http://$PROXY" \
+ALL_PROXY="http://$PROXY" \
+no_proxy="127.0.0.1,localhost,*.priv.atos.fr" \
+NO_PROXY="127.0.0.1,localhost,*.priv.atos.fr" \
+HTTPS_PROXY="https://$PROXY" \
+https_proxy="https://$PROXY" \
+FTP_PROXY="http://$PROXY" \
+ftp_proxy="http://$PROXY" \
+HTTP_PROXY="http://$PROXY" \
+http_proxy="http://$PROXY" \
+$@

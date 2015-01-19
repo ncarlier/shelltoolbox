@@ -1,0 +1,9 @@
+
+# Get dates
+exiftool -ModifyDate -CreateDate GOPR0081.MP4
+
+# Update dates
+exiftool -ModifyDate="2014:04:26 18:44:05" -CreateDate="2014:04:26 18:44:05" GOPR0081.MP4
+
+# Build directory structure
+exiftool '-FileName<CreateDate' -d %Y/%Y-%m-%d_%%f.%%e .

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Backup images.
+export JOBNAME=backup-private-images
+JOBCMD="rsync -r -e ssh /data/images/ archive:/mnt/private/nicolas/images --stats"
+
+/usr/local/sbin/monitor-job $JOBCMD
+
+# Backup videos.
+export JOBNAME=backup-private-videos
+JOBCMD="rsync -r -e ssh /data/videos/private/ archive:/mnt/private/nicolas/videos --stats"
+
+/usr/local/sbin/monitor-job $JOBCMD

@@ -1,0 +1,3 @@
+#!/bin/sh
+# http://www.munz.li/2008/07/23/time-lapse-convert-single-jpg-images-to-a-movie/
+mencoder -ovc copy -mf w=800:h=371:fps=6:type=jpg 'mf://*.jpg' -o time_lapse-test.avi

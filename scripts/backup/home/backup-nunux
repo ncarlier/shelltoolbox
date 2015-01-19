@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export JOBNAME=backup-nunux
+JOBCMD="rsync -vr -e ssh archive:/mnt/storage/nunux/ /data/archives/nunux --delete-after --stats"
+
+/usr/local/sbin/monitor-job $JOBCMD

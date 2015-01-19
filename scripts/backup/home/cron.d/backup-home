@@ -1,0 +1,2 @@
+# Backup Home archives to remote archive server
+00 07 * * * root [ -x /usr/local/sbin/backup-home ] && /usr/local/sbin/backup-home

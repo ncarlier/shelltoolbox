@@ -1,0 +1,1 @@
+rsync -avz --stats ~/Images/ nicolas@home:/data/images/

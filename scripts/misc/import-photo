@@ -1,0 +1,88 @@
+#!/bin/bash
+
+base_directory=~/_data/photos/2008
+index=0
+new_directories=()
+
+##
+# Sort photos.
+##
+function sort {
+        target_directory=$base_directory/"$(exiftool -CreateDate -d "%Y_%m_%d" $1 | cut -d " " -f24)"
+        if test ! -e $target_directory; then
+          mkdir -p $target_directory
+          new_directories[$index]=$target_directory
+          index+=1
+        fi
+        mv $1 $target_directory
+}
+
+# Camera detection...
+if [ "$(gphoto2 --auto-detect | wc -l)" -ge 3 ]; then
+        camera="$(gphoto2 --auto-detect)"
+        zenity --question --text="Voulez-vous importer les photos de l'appareil ? \n\n$camera" --title="Import!"
+        resp=$?
+else
+        zenity --warning --text="Aucun APN détecté! L'import ne peut continuer."
+        exit
+fi
+
+if [ $resp = 1 ]; then
+        exit
+fi
+
+# Base directory setup...
+base_directory=$(zenity --file-selection --filename=$base_directory --directory --title "Répertoire de base" --text "Choisir ici le répertoire de base :")
+if [ "$base_directory" = "" ]; then
+        zenity --warning --text="Répertoire de base non choisi. Répertoir home par défaut!"
+        base_directory=~/
+fi
+
+# Import...
+mkdir $base_directory/import
+cd $base_directory/import
+gphoto2 --get-all-files 2> /dev/null | zenity --progress --title "Import..." --text="Veuillez patienter,\nImport des photos en cours..." --pulsate --auto-close
+
+if [ "${PIPESTATUS[0]}" != "0" ]; then
+        zenity --error --text="Echec lors de l'import!!!" --title="Erreur"
+        exit
+fi
+
+# Sort...
+for i in *.cr2 *.CR2 *.jpg *.JPG; do
+        sort $i;
+done | zenity --progress --title "Tri..." --text="Veuillez patienter,\nTri des photos en cours..." --pulsate --auto-close
+
+if [ $? != 0 ]; then
+        zenity --error --text="Echec lors du tri!!!" --title="Erreur"
+        exit
+fi
+
+cd -
+rm -r $base_directory/import
+
+zenity --question --text="Import terminé. Voulez-vous supprimer les photos de l'APN ?" --title="Import successful"
+resp=$?
+
+if [ $resp = 0 ]; then
+        gphoto2 --delete-all-files --recurse 2> /dev/null | zenity --progress --text="Veuillez patienter,\nSuppression des photos en cours..." --pulsate --auto-close
+        if [ "${PIPESTATUS[0]}" != "0" ]; then
+          zenity --error --text="Echec lors de la suppression des photos!!!" --title="Erreur"
+          exit
+        fi
+fi
+
+exit
+
+
+
+####LensType
+#function LType {
+#if [ "$(exiftool -Lens $i | cut -c35-45)" = "18.0 - 55.0" ]; then
+# exiftool -LensType="Canon EF-S 18-55mm f/3.5-5.6" $i
+#elif [ "$(exiftool -Lens $i | cut -c35-37)" = "200" ]; then
+# exiftool -LensType="Canon EF 200mm f/2.8L II" $i
+#elif [ "$(exiftool -Lens $i | cut -c35-36)" = "50" ]; then
+# exiftool -LensType="Canon EF 50mm f/1.8" $i
+#fi
+"}
