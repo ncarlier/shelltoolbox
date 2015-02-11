@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export vnc_port=$1
+if [ -z "$vnc_port" ]; then
+    echo "VNC port not defined."
+    exit 1
+fi
+
+export backpipe=/tmp/vnc-backpipe
+if [ ! -p "$backpipe" ]; then
+    mkfifo $backpipe
+fi
+
+nc -l 5900 0<$backpipe | nc localhost $vnc_port 1>$backpipe
